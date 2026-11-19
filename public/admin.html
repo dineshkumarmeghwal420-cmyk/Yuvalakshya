@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Yuva Lakshya Admin</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fb;color:#172338;font-family:system-ui,"Noto Sans Devanagari",sans-serif}header{background:#102a56;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:10px}header b{font-size:20px}.wrap{width:min(1050px,92%);margin:25px auto}.warning{background:#fff5e5;border:1px solid #f2d4a5;color:#80500d;padding:12px;border-radius:10px;font-size:13px;margin-bottom:17px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{background:white;border:1px solid #e1e8f0;border-radius:14px;padding:18px}.panel h2{margin:0 0 14px;color:#102a56;font-size:18px}label{display:block;font-size:13px;font-weight:700;margin:11px 0 5px}input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}textarea{min-height:85px}button{border:0;border-radius:8px;padding:10px 14px;background:#f28c28;color:#241606;font-weight:800;cursor:pointer;margin:8px 5px 0 0}.secondary{background:#eaf0f7;color:#102a56}.danger{background:#fff0ef;color:#a12e27}.hidden{display:none}.post{border-top:1px solid #e5eaf1;padding:12px 0}.post h3{font-size:15px;margin:0 0 5px;color:#174a8b}.post small{color:#64748b}.message{font-size:13px;color:#174a8b;margin:10px 0}.row{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style></head><body><header><b>YUVA LAKSHYA · ADMIN</b><button id="logout" class="secondary hidden">Logout</button></header><main class="wrap">
+<div class="warning"><b>सुरक्षा:</b> यह Admin Panel सर्वर-आधारित लॉगिन, सुरक्षित session और CSRF सुरक्षा के साथ चलता है। इसे केवल HTTPS पर production में चलाएँ। अपना पासवर्ड किसी से साझा न करें।</div>
+<section id="loginPanel" class="panel"><h2>Admin Login</h2><form id="loginForm"><label>Email</label><input id="email" type="email" autocomplete="username" required><label>Password</label><input id="password" type="password" autocomplete="current-password" required><button>Login</button></form><div id="loginMsg" class="message"></div></section>
+<section id="dashboard" class="hidden"><div class="grid">
+<div class="panel"><h2 id="formTitle">नई पोस्ट प्रकाशित करें</h2><form id="postForm">
+<label>कैटेगरी</label><select id="category"><option>सरकारी नौकरी</option><option>एडमिट कार्ड</option><option>रिजल्ट</option><option>एडमिशन</option><option>स्कॉलरशिप</option><option>स्टडी मटेरियल</option><option>अन्य अपडेट</option></select>
+<label>शीर्षक</label><input id="title" maxlength="140" required>
+<label>राज्य / क्षेत्र</label><input id="state" value="All India" maxlength="60">
+<label>विभाग</label><input id="department" maxlength="80">
+<label>योग्यता</label><input id="qualification" maxlength="80">
+<label>अंतिम तारीख</label><input id="last_date" maxlength="60" placeholder="उदाहरण: 20 दिसंबर 2026">
+<label>Official URL</label><input id="official_url" type="url" maxlength="500" placeholder="https://...">
+<label>विवरण</label><textarea id="details" maxlength="3000"></textarea>
+<label>स्थिति</label><select id="status"><option value="draft">Draft (अप्रकाशित)</option><option value="published">Published (वेबसाइट पर दिखेगा)</option></select>
+<div class="row"><button type="submit">Save Post</button><button type="button" class="secondary" id="reset">Clear</button></div><div id="formMsg" class="message"></div>
+</form></div>
+<div class="panel"><h2>सभी पोस्ट</h2><div id="postList">लोड हो रहा है...</div></div>
+</div></section></main>
+<script src="/admin.js"></script></body></html>
