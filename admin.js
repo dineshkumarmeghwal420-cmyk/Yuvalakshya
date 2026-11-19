@@ -1,0 +1,17 @@
+let token="",editingId=null;
+const $=id=>document.getElementById(id);
+async function getToken(){const r=await fetch("/api/csrf");const d=await r.json();token=d.token;}
+async function api(url,opts={}){opts.headers={...(opts.headers||{}),"Content-Type":"application/json","X-CSRF-Token":token};const r=await fetch(url,opts);const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Request failed");return d;}
+function showDashboard(email){$("loginPanel").classList.add("hidden");$("dashboard").classList.remove("hidden");$("logout").classList.remove("hidden");loadPosts();}
+async function checkSession(){await getToken();try{const r=await fetch("/api/auth/me");if(r.ok){const d=await r.json();token=d.csrfToken;showDashboard(d.email);}}catch{}}
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();$("loginMsg").textContent="";try{const d=await api("/api/auth/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});token=d.csrfToken;showDashboard(d.email);}catch(err){$("loginMsg").textContent=err.message;}});
+$("logout").addEventListener("click",async()=>{try{await api("/api/auth/logout",{method:"POST",body:"{}"});}finally{location.reload();}});
+function formData(){return Object.fromEntries(["category","title","state","department","qualification","last_date","official_url","details","status"].map(k=>[k,$(k).value]));}
+$("postForm").addEventListener("submit",async e=>{e.preventDefault();$("formMsg").textContent="सेव हो रहा है...";try{if(editingId){await api("/api/admin/posts/"+editingId,{method:"PUT",body:JSON.stringify(formData())});}else{await api("/api/admin/posts",{method:"POST",body:JSON.stringify(formData())});}$("formMsg").textContent="पोस्ट सेव हो गई।";resetForm();loadPosts();}catch(err){$("formMsg").textContent=err.message;}});
+function resetForm(){editingId=null;$("postForm").reset();$("state").value="All India";$("status").value="draft";$("formTitle").textContent="नई पोस्ट प्रकाशित करें";}
+$("reset").addEventListener("click",resetForm);
+async function loadPosts(){try{const rows=await api("/api/admin/posts");$("postList").innerHTML=rows.length?rows.map(p=>`<article class="post"><h3>${esc(p.title)}</h3><small>${esc(p.category)} · ${esc(p.state)} · ${p.status==="published"?"Published":"Draft"}</small><div class="row"><button class="secondary" data-edit="${p.id}">Edit</button><button class="danger" data-delete="${p.id}">Delete</button></div></article>`).join(""):'<p>अभी कोई पोस्ट नहीं है।</p>';$("postList").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editPost(rows.find(p=>p.id===Number(b.dataset.edit))));$("postList").querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>deletePost(b.dataset.delete));}catch(e){$("postList").textContent=e.message;}}
+function editPost(p){editingId=p.id;["category","title","state","department","qualification","last_date","official_url","details","status"].forEach(k=>$(k).value=p[k]||"");$("formTitle").textContent="पोस्ट संपादित करें";window.scrollTo({top:0,behavior:"smooth"});}
+async function deletePost(id){if(!confirm("क्या आप यह पोस्ट हटाना चाहते हैं?"))return;try{await api("/api/admin/posts/"+id,{method:"DELETE"});loadPosts();}catch(e){alert(e.message);}}
+function esc(s){return String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+checkSession();
